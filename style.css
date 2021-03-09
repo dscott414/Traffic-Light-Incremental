@@ -1,0 +1,325 @@
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+/* CSS files add styling rules to your content */
+body {
+  background: #000000;
+  font-family: verdana, arial, sans-serif;
+  margin: 2em;
+  color: #FFFFFF;
+  text-align: center;
+  height: 100%;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  margin: auto;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 150px;
+  background-color: black;
+  color: #FFFFFF;
+  text-align: center;
+  border-radius: 6px;
+  bottom: 100%;
+  left: 0%;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+table {
+  margin: auto;
+  background: transparent;
+  align: center;
+  text-align: center;
+}
+
+.trafficLight {
+  border: 10px solid;
+  border-radius: 10px;
+  border-color: #FFFF00;
+  align: center;
+  margin-right: 150px;
+  margin-left: 200px;
+}
+
+button {
+  transition-duration: 0.4s;
+  font-family: sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+  background: transparent;
+}
+
+.menu {
+  background: transparent;
+  color: white;
+  height: 40px;
+  width: 200px;
+  border-radius: 5px;
+  border-color: white;
+  margin-left: 200px;
+  border: solid;
+}
+
+.menu:hover {
+  background: white;
+  cursor: pointer;
+  color: black;
+  border-radius: 5px;
+  border-color: transparent;
+}
+
+.progressLog {
+  font-size: 12pt;
+  color: white;
+  background: transparent;
+  border-color: #FFFFFF;
+  height: 200px;
+  width: 300px;
+  margin-left: 0px;
+  margin-right: 150px;
+  border: solid;
+  overflow: auto;
+  align: center;
+  text-align: center;
+}
+
+.progressLog:hover {
+  cursor: default;
+  font-size: 12pt;
+  color: white;
+  background: transparent;
+  border-color: white;
+}
+
+.progEntry {
+  font-family: times new roman;
+  font-size: 12pt;
+  color: white;
+  padding: 15px;
+  align: center;
+  text-align: center;
+  vertical-align: middle;
+  animation: progEntry 3s;
+}
+
+@keyframes progEntry {
+  0% {color: transparent;
+    opacity: 0;
+  }
+  25% {background-color: green;
+    color: white;
+  opacity: 1;}
+  50% {background-color: yellow;
+    color: black;
+  opacity: 1;}
+  75% {background-color: red;
+    color: white;
+  opacity: 1;}
+  100% {background-color: transparent;
+    color: white;
+  opacity: 1;}
+}
+
+.endWorld {
+  background-image: radial-gradient(circle, white, transparent);
+  color: black;
+  font-family: sans-serif;
+  font-size: 30pt;
+  font-weight: bold;
+  animation: endWorld 10s;
+  height: 100%;
+  width: auto;
+  margin: auto;
+  align: center;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+@keyframes endWorld {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tabButtonGreen {
+  font-family: sans-serif;
+  background: #00FF00;
+  color: #000000;
+  border-radius: 25px;
+  border-color: transparent;
+  border-weight: 0px;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  font-size: 15pt;
+  font-weight: bold;
+  margin: 5px;
+  opacity: 0.5;
+}
+
+.tabButtonYellow {
+  font-family: sans-serif;
+  background: #FFFF00;
+  color: #000000;
+  border-radius: 25px;
+  border-color: transparent;
+  border-weight: 0px;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  font-size: 15pt;
+  font-weight: bold;
+  margin: 5px;
+  opacity: 0.5;
+}
+
+.tabButtonRed {
+  font-family: sans-serif;
+  background: #FF0000;
+  color: #000000;
+  border-radius: 25px;
+  border-color: transparent;
+  border-weight: 0px;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  font-size: 15pt;
+  font-weight: bold;
+  margin: 5px;
+  opacity: 0.5;
+}
+
+.litUp {
+  cursor: default;
+  opacity: 1;
+}
+
+.noClick {
+  cursor: not-allowed;
+}
+
+.subtab {
+  font-family: sans-serif;
+  background: transparent;
+  border-radius: 5px;
+  border-weight: 5px;
+  cursor: pointer;
+  width: 150px;
+  height: 50px;
+  font-size: 15pt;
+  text-align: center;
+  margin: 5px;
+}
+
+.subtab:hover {
+  background: transparent;
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+.milestone {
+  background: transparent;
+  border-radius: 75px;
+  border-weight: 0px;
+  cursor: default;
+  width: 150px;
+  height: 150px;
+  font-size: 10pt;
+  margin: 5px;
+}
+
+.greenoutline {
+  color: #00FF00;
+  border-color: #00FF00;
+}
+
+.yellowoutline {
+  color: #FFFF00;
+  border-color: #FFFF00;
+}
+
+.redoutline {
+  color: #FF0000;
+  border-color: #FF0000;
+}
+
+.whitefill {
+  color: #000000;
+  background: #FFFFFF;
+  border-color: transparent;
+}
+
+.greenfill {
+  color: #000000;
+  background: #00FF00;
+  border-color: transparent;
+}
+
+.yellowfill {
+  color: #000000;
+  background: #FFFF00;
+  border-color: transparent;
+}
+
+.redfill {
+  color: #000000;
+  background: #FF0000;
+  border-color: transparent;
+}
+
+.num {
+  font-size: 30;
+  font-weight: bold;
+  text-shadow: 2px 2px #999999;
+}
+
+.upgrade {
+  background: transparent;
+  border-radius: 10px;
+  border-weight: 0px;
+  cursor: pointer;
+  width: 150px;
+  height: 150px;
+  font-size: 10pt;
+  margin: 5px;
+}
+
+.upgrade:hover {
+  background: transparent;
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+.upgradeName {
+  font-size: 12pt;
+}

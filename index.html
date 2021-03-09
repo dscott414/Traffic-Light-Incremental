@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" >
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="icon"
+      href="https://cdn.glitch.com/489f9bfc-deff-49e0-b7a3-ba935d6fefae%2Ftraffic_light-removebg-preview.png?v=1613980588934"
+    />
+    <title>Traffic Light Incremental</title>
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- import the webpage's javascript files -->
+    <script src="game/jquery.js" defer></script>
+    <script src="game/vue.js" defer></script>
+    <script src="game/newgame.js" defer></script>
+    <script src="game/newvue.js" defer></script>
+    <script src="game/saveload.js" defer></script>
+    <script src="game/canvas.js" defer></script>
+    <script src="game/log.js" defer></script>
+    <script src="game/general.js" defer></script>
+    <script src="game/progression.js" defer></script>
+    <script src="game/milestones.js" defer></script>
+    <script src="game/speed.js" defer></script>
+    <script src="game/red.js" defer></script>
+    <script src="game/script.js" defer></script>
+  </head>
+  <body>
+    <h1>
+      Traffic Light Incremental
+    </h1>
+    <div id="app">
+      <div id="endWorld" class="endWorld" v-if="game.gameOver">
+        <p>
+          Thank you for playing! <br>This was made for the 2021 IGJ by dillydally.<br>
+          Reach me on Discord at dillydally#0477. <br>Click below to play again!
+        </p><br>
+        <button class="menu redfill" style="margin: auto" v-on:click="
+let deathPrompt = '';
+  deathPrompt = confirm('This will permanently reset your entire game.');
+  if (deathPrompt) {
+    game = newGame();
+    localStorage.removeItem('trafficRemasteredSave')
+    save();
+    location.reload();
+  }">
+          Click me to play again!
+        </button>
+      </div>
+      <div v-if="!game.gameOver">
+      <table>
+        <tr>
+          <td>
+            <button id="save" class="menu" v-on:click="save()">
+              Save (Saved {{ game.sinceLastSave.toFixed(2) }}s ago)
+            </button>
+          </td>
+          <td rowspan="4">
+            <table class="trafficLight">
+              <tr>
+                <td style="height:40px">
+                  <button id="redTraffic" class="tabButtonRed" v-on:click="enterLayer(3)"></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="height:40px">
+                  <button id="yellowTraffic" class="tabButtonYellow" v-on:click="enterLayer(2)"></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="height:40px">
+                  <button id="greenTraffic" class="tabButtonGreen" v-on:click="enterLayer(1)"></button>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td rowspan="4">
+            <div id="progLog" class="menu progressLog" v-if="game.progress != null"></div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button
+              class="menu"
+              onclick="copyStringToClipboard(JSON.stringify(game));"
+            >
+              Export
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button
+              class="menu"
+              onclick="
+          let loadgame = '';
+          loadgame = JSON.parse(prompt('Paste in your save. WARNING: WILL OVERWRITE YOUR CURRENT SAVE, paste in nothing if you want to keep your current save.'));
+          if (prompt !== '' && loadgame !== '') {
+            loadData(loadgame);}"
+            >
+              Import
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button class="menu redfill" onclick="llet deathPrompt = '';
+  deathPrompt = confirm('This will permanently reset your entire game.');
+  if (deathPrompt) {
+    game = newGame();
+    localStorage.removeItem('trafficRemasteredSave')
+    save();
+    location.reload();
+  }">Hard Reset</button>
+          </td>
+        </tr>
+      </table>
+      <canvas id = "myCanvas">
+        
+        </canvas>
+        <!--
+      <div v-show="game.tab == 1">
+        <p>
+          You are traveling at
+          <span class="num greenoutline">{{ game.speed.toFixed(2) }}</span> m/s<span v-if="!game.temperTantrum">,
+          which caps at {{ game.speedCap.toFixed(2) }} m/s</span>.<br />
+          Your acceleration is
+          <span class="num greenoutline">{{ disp(speedRate()) }}</span>
+          m/s<sup>2</sup>.
+        </p>
+        <table>
+          <tr>
+            <td style="height:40px">
+              <button
+                v-on:click="game.layerSubtab[0] = 1"
+                v-show="subtabUnlocked(1,1)"
+                class="subtab greenoutline"
+              >
+                Upgrades
+              </button>
+            </td>
+            <td style="height:40px">
+              <button
+                v-on:click="game.layerSubtab[0] = 2"
+                v-show="subtabUnlocked(1,2)"
+                class="subtab greenoutline"
+              >
+                Milestones
+              </button>
+            </td>
+          </tr>
+        </table>
+
+        <div v-show="game.layerSubtab[0] == 1">
+          <table>
+            <tr>
+              <td style="height:40px">
+                <button
+                  class="greenoutline upgrade"
+                  v-on:click="buy('capUp')"
+                >
+                  <div class="upgradeName">
+                    Reduce Drag
+                  </div>
+                  <br />
+                  cost: <br />{{ getCost("capUp").toFixed(2) }} m/s<br /><br />
+                  effect: Multiplies top speed by {{ (Math.pow(game.capUpgrades,
+                  2)) }} and base acceleration by {{ game.capUpgrades }}
+                </button>
+              </td>
+              <td style="height:40px" v-show="game.capUpgrades >= 2">
+                <button
+                  class="greenoutline upgrade"
+                  v-on:click="buy('speedUp')"
+                >
+                  <div class="upgradeName">
+                    Buy New Motor
+                  </div>
+                  <br />
+                  cost: <br />{{ getCost("speedUp").toFixed(2) }} m/s<br /><br />
+                  effect: Multiplies base acceleration by {{ game.speedUpgrades
+                  }}<br />
+                  <br />
+                </button>
+              </td>
+              <td style="height:40px" v-show="game.speedUpgrades >= 4">
+                <button class="greenoutline upgrade" v-on:click="buy('nitro')">
+                  <div class="upgradeName">
+                    Nitro
+                  </div>
+                  <br />
+                  cost: <br />
+                  <div v-if="game.nitro">
+                    bought
+                  </div>
+                  <div v-else>
+                    {{ getCost('nitro').toFixed(2) }} m/s
+                  </div>
+                  <br />
+                  effect: Speed cap increases with acceleration<br /><br />
+                </button>
+              </td>
+              <td style="height:40px" v-show="game.nitro">
+                <button class="greenoutline upgrade" v-on:click="buy('rocket')">
+                  <div class="upgradeName">
+                    Rocket Boosters
+                  </div>
+                  <br />
+                  cost: <br />
+                  <div v-if="game.rocketBooster">
+                    bought
+                  </div>
+                  <div v-else>
+                    {{ getCost('rocket').toFixed(2) }} m/s
+                  </div>
+                  <br />
+                  effect: Acceleration does not decrease<br /><br />
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div v-show="game.layerSubtab[0] == 2">
+          <table>
+            <tr>
+              <td style="height:40px">
+                <button
+                  class="greenoutline milestone tooltip"
+                  v-if="!milestoneData.milestone[0]()"
+                >
+                  <div class="tooltiptext">
+                    {{ getMilestone("tooltip", 0) }}
+                  </div>
+                  <div class="upgradeName">
+                    {{ getMilestone("name", 0) }}
+                  </div>
+                  <br />
+                  reward: ???
+                </button>
+                <button class="greenfill milestone tooltip" v-else>
+                  <div class="tooltiptext">
+                    {{ getMilestone("tooltip", 0) }}
+                  </div>
+                  <div class="upgradeName">
+                    {{ getMilestone("name", 0) }}
+                  </div>
+                  <br />
+                  reward: {{ getMilestone("reward", 0) }}
+                </button>
+              </td>
+              <td style="height:40px">
+                <button
+                  class="greenoutline milestone tooltip"
+                  v-if="!milestoneData.milestone[1]()"
+                >
+                  <div class="tooltiptext">
+                    {{ getMilestone("tooltip", 1) }}
+                  </div>
+                  <div class="upgradeName">
+                    {{ getMilestone("name", 1) }}
+                  </div>
+                  <br />
+                  reward: ???
+                </button>
+                <button class="greenfill milestone tooltip" v-else>
+                  <div class="tooltiptext">
+                    {{ getMilestone("tooltip", 1) }}
+                  </div>
+                  <div class="upgradeName">
+                    {{ getMilestone("name", 1) }}
+                  </div>
+                  <br />
+                  reward: {{ getMilestone("reward", 1) }}
+                </button>
+              </td>
+              <td style="height:40px">
+                <button
+                  class="greenoutline milestone tooltip"
+                  v-if="!milestoneData.milestone[2]()"
+                >
+                  <div class="tooltiptext">
+                    {{ getMilestone("tooltip", 2) }}
+                  </div>
+                  <div class="upgradeName">
+                    {{ getMilestone("name", 2) }}
+                  </div>
+                  <br />
+                  reward: ???
+                </button>
+                <button class="greenfill milestone tooltip" v-else>
+                  <div class="tooltiptext">
+                    {{ getMilestone("tooltip", 2) }}
+                  </div>
+                  <div class="upgradeName">
+                    {{ getMilestone("name", 2) }}
+                  </div>
+                  <br />
+                  reward: {{ getMilestone("reward", 2) }}
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div v-show="game.tab == 2">
+        <p>
+          You are traveling at
+          <span class="num yellowoutline">{{ game.speed.toFixed(2) }}</span>
+          m/s.<br />
+          Your deceleration is
+          <span class="num yellowoutline">{{ disp(-speedRate()) }}</span>
+          m/s<sup>2</sup>.
+        </p>
+        <table>
+          <tr>
+            <td style="height:40px">
+              <button
+                v-on:click="game.layerSubtab[1] = 1"
+                v-show="subtabUnlocked(2,1)"
+                class="subtab yellowoutline"
+              >
+                Upgrades
+              </button>
+            </td>
+          </tr>
+        </table>
+
+        <div v-show="game.layerSubtab[1] == 1">
+          <p v-show="!game.seatbelts">
+            <b>ALL UPGRADES RESET SPEED TO 1000 M/S.</b>
+          </p>
+          <table>
+            <tr>
+              <td style="height:40px">
+                <button
+                  class="yellowoutline upgrade"
+                  v-on:click="buy('brakes')"
+                >
+                  <div class="upgradeName">
+                    Buy New Brakes
+                  </div>
+                  <br />
+                  requirement: <br />&lt{{ getCost("brakes").toFixed(2) }} m/s<br /><br />
+                  effect: Increases base deceleration
+                </button>
+              </td>
+              <td style="height:40px" v-show="game.brakes >= 1">
+                <button
+                  class="yellowoutline upgrade"
+                  v-on:click="buy('airbags')"
+                >
+                  <div class="upgradeName">
+                    Buy Airbags
+                  </div>
+                  <br />
+                  requirement: <br />&lt{{ getCost("airbags").toFixed(2) }} m/s<br /><br />
+                  effect: Multiplies base deceleration by {{ game.airbags
+                  }}<br />
+                  <br />
+                </button>
+              </td>
+              <td style="height:40px" v-show="game.airbags >= 4">
+                <button class="yellowoutline upgrade" v-on:click="buy('seatbelts')">
+                  <div class="upgradeName">
+                    Seatbelts
+                  </div>
+                  <br />
+                  requirement: <br />
+                  <div v-if="game.seatbelts">
+                    bought
+                  </div>
+                  <div v-else>
+                    &lt{{ getCost('seatbelts').toFixed(2) }} m/s
+                  </div>
+                  <br />
+                  effect: Upgrades no longer reset speed & upgrades are autobought<br /><br />
+                </button>
+              </td>
+              <td style="height:40px" v-show="game.seatbelts">
+                <button class="yellowoutline upgrade" v-on:click="buy('testDummy')">
+                  <div class="upgradeName">
+                    Crash Test Dummy
+                  </div>
+                  <br />
+                  cost: <br />
+                  <div v-if="game.testDummy == 2">
+                    bought
+                  </div>
+                  <div v-else>
+                    &lt{{ getCost('testDummy').toFixed(2) }} m/s
+                  </div>
+                  <br />
+                  effect: Squares brake and airbag effect<br /><br />
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div v-show="game.tab == 3">
+        <p>
+          You have
+          <span class="num redoutline">{{ game.impatience.toFixed(0) }}</span>
+          impatience.<br />
+          You are gaining
+          <span class="num redoutline">{{ impatienceRate() }}</span> impatience
+          per second.
+        </p>
+        <table>
+          <tr>
+            <td style="height:40px">
+              <button
+                v-on:click="game.layerSubtab[2] = 1"
+                v-show="subtabUnlocked(3,1)"
+                class="subtab redoutline"
+              >
+                Upgrades
+              </button>
+            </td>
+          </tr>
+        </table>
+
+        <div v-show="game.layerSubtab[2] == 1">
+          <table>
+            <tr>
+              <td style="height:40px">
+                <button
+                  class="redoutline upgrade"
+                  v-on:click="buy('roadRage')"
+                >
+                  <div class="upgradeName">
+                    Induce Road Rage
+                  </div>
+                  <br />
+                  cost: <br />{{ getCost("roadRage").toFixed(2) }} impatience<br /><br />
+                  effect: Multiplies impatience gain by {{ game.roadRage }}
+                </button>
+              </td>
+              <td style="height:40px" v-show="game.roadRage >= 2">
+                <button
+                  class="redoutline upgrade"
+                  v-on:click="buy('traffic')"
+                >
+                  <div class="upgradeName">
+                    Hallucinate Traffic
+                  </div>
+                  <br />
+                  requirement: <br />{{ getCost("traffic").toFixed(2) }} impatience<br /><br />
+                  effect: Raises impatience gain to {{ game.traffic
+                  }}<br />
+                  <br />
+                </button>
+              </td>
+              <td style="height:40px" v-show="game.traffic >= 3">
+                <button class="redoutline upgrade" v-on:click="buy('temperTantrum')">
+                  <div class="upgradeName">
+                    Throw a Temper Tantrum
+                  </div>
+                  <br />
+                  cost: <br />
+                  <div v-if="game.temperTantrum">
+                    bought
+                  </div>
+                  <div v-else>
+                    {{ getCost('temperTantrum').toFixed(2) }} impatience
+                  </div>
+                  <br />
+                  effect: ???<br /><br />
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+        </div>
+-->
+      </div>
+    </div>
+  </body>
+</html>
